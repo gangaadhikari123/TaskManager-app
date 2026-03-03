@@ -1,5 +1,4 @@
-import { useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
@@ -7,17 +6,24 @@ function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/token/",
-        { username, password }
-      );
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-      localStorage.setItem("token", response.data.access);
+    const response = await fetch("http://127.0.0.1:8000/api/token/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem("access", data.access);
+      localStorage.setItem("refresh", data.refresh);
       navigate("/dashboard");
-
-    } catch (error) {
+    } else {
       alert("Invalid credentials");
     }
   };
@@ -25,16 +31,19 @@ function Login() {
   return (
     <div>
       <h2>Login</h2>
-      <input 
-        placeholder="Username"
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input 
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleLogin}>Login</button>
+      <form onSubmit={handleLogin}>
+        <input
+          type="text"
+          placeholder="Username"
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="submit">Login</button>
+      </form>
     </div>
   );
 }

@@ -1,26 +1,27 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/tasks/", {
+    const token = localStorage.getItem("access");
+
+    fetch("http://127.0.0.1:8000/api/tasks/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-    .then(res => setTasks(res.data))
-    .catch(err => console.log(err));
+      .then((res) => res.json())
+      .then((data) => setTasks(data));
   }, []);
 
   return (
     <div>
-      <h2>My Tasks</h2>
-      {tasks.map(task => (
+      <h2>Dashboard</h2>
+
+      {tasks.map((task) => (
         <div key={task.id}>
-          <p>{task.title} - {task.completed ? "Done" : "Pending"}</p>
+          {task.title} - {task.completed ? "✅" : "❌"}
         </div>
       ))}
     </div>
