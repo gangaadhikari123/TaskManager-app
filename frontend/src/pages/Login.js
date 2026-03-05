@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
@@ -14,14 +14,16 @@ function Login() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({
+        username,
+        password,
+      }),
     });
 
     const data = await response.json();
 
-    if (response.ok) {
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
+    if (data.access) {
+      localStorage.setItem("token", data.access);
       navigate("/dashboard");
     } else {
       alert("Invalid credentials");
@@ -29,22 +31,23 @@ function Login() {
   };
 
   return (
-    <div>
+    <form onSubmit={handleLogin}>
       <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="text"
-          placeholder="Username"
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Login</button>
-      </form>
-    </div>
+
+      <input
+        type="text"
+        placeholder="Username"
+        onChange={(e) => setUsername(e.target.value)}
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <button type="submit">Login</button>
+    </form>
   );
 }
 
